@@ -58,6 +58,30 @@ GET /api/logout
 }
 ```
 
+#### islogin
+
+```
+GET api/islogin
+```
+
+判断当前是否有账户登陆。errcode为0则登陆，否则未登录。
+
+```json
+GET /api/islogin
+{
+  "errcode": 0,
+  "errmsg": ""
+}
+```
+
+```json
+GET /api/islogin
+{
+  "errcode": 1,
+  "errmsg": ""
+}
+```
+
 #### signup
 
 ```
