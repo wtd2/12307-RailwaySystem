@@ -80,7 +80,7 @@ class Service:
         return result
 
     def passenger_info(self):
-        stmt = "select passenger_id, passenger_name, idcard_number, phone_number from passenger_info where related_user = %s and shown = true;"
+        stmt = "select passenger_id, passenger_name, idcard_number, phone_number from passenger_info where related_user = %s and shown = true order by passenger_id;"
         conn = self.cp.getconn()
         cursor = conn.cursor()
         cursor.execute(stmt, (self.id, ))
@@ -156,16 +156,42 @@ class Service:
         conn = self.cp.getconn()
         cursor = conn.cursor()
         cursor.execute(stmt, (name, idcard, phone, self.id))
-        cursor.fetchall()
         conn.commit()
         cursor.close()
         self.cp.putconn(conn)
 
     def delete_passenger(self, num: int):
-        stmt = "update passenger_info set shown = false where passenger_id = %s and related_user = %s;"
+        stmt = "select passenger_id from passenger_info where passenger_id = %s and related_user = %s;"
         conn = self.cp.getconn()
         cursor = conn.cursor()
         cursor.execute(stmt, (num, self.id))
+        result = cursor.fetchall()
+        cursor.close()
+        self.cp.putconn(conn)
+        if len(result) != 1:
+            raise Exception('No such privilege')
+        stmt = "update passenger_info set shown = false where passenger_id = %s;"
+        conn = self.cp.getconn()
+        cursor = conn.cursor()
+        cursor.execute(stmt, (num, ))
+        conn.commit()
+        cursor.close()
+        self.cp.putconn(conn)
+
+    def update_passenger(self, num: int, name: str, idcard: str, phone: str):
+        stmt = "select passenger_id from passenger_info where passenger_id = %s and related_user = %s;"
+        conn = self.cp.getconn()
+        cursor = conn.cursor()
+        cursor.execute(stmt, (num, self.id))
+        result = cursor.fetchall()
+        cursor.close()
+        self.cp.putconn(conn)
+        if len(result) != 1:
+            raise Exception('No such privilege')
+        stmt = "update passenger_info set (passenger_name, idcard_number, phone_number) = (%s, %s, %s) where passenger_id = %s;"
+        conn = self.cp.getconn()
+        cursor = conn.cursor()
+        cursor.execute(stmt, (name, idcard, phone, num))
         conn.commit()
         cursor.close()
         self.cp.putconn(conn)

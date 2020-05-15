@@ -298,7 +298,81 @@ def refund():
     return res, status.HTTP_200_OK
 
 
+@app.route("/api/addpassenger", methods=['GET', 'POST'])
+def add_passenger():
+    try:
+        token = request.cookies.get('12307_token')
+        if token not in uuid:
+            raise Exception('Unauthorized')
+        name = request.args.get('name')
+        card = request.args.get('idcard')
+        phone = request.args.get('phone')
+        s = uuid[token]
+        s.insert_passenger(name, card, phone)
+        errcode = 0
+        errmsg = ''
 
+    except Exception as e:
+        errcode = 1
+        errmsg = str(e)
+    res = {
+        'errcode': errcode,
+        'errmsg': errmsg
+    }
+    if res['errcode']:
+        return res, status.HTTP_401_UNAUTHORIZED
+    return res, status.HTTP_200_OK
+
+
+@app.route("/api/editpassenger", methods=['GET', 'POST'])
+def modify_passenger():
+    try:
+        token = request.cookies.get('12307_token')
+        if token not in uuid:
+            raise Exception('Unauthorized')
+        pid = request.args.get('id')
+        name = request.args.get('name')
+        card = request.args.get('idcard')
+        phone = request.args.get('phone')
+        s = uuid[token]
+        s.update_passenger(pid, name, card, phone)
+        errcode = 0
+        errmsg = ''
+
+    except Exception as e:
+        errcode = 1
+        errmsg = str(e)
+    res = {
+        'errcode': errcode,
+        'errmsg': errmsg
+    }
+    if res['errcode']:
+        return res, status.HTTP_401_UNAUTHORIZED
+    return res, status.HTTP_200_OK
+
+
+@app.route("/api/deletepassenger", methods=['GET', 'POST'])
+def delete_passenger():
+    try:
+        token = request.cookies.get('12307_token')
+        if token not in uuid:
+            raise Exception('Unauthorized')
+        pid = request.args.get('passenger_id')
+        s = uuid[token]
+        s.delete_passenger(pid)
+        errcode = 0
+        errmsg = ''
+
+    except Exception as e:
+        errcode = 1
+        errmsg = str(e)
+    res = {
+        'errcode': errcode,
+        'errmsg': errmsg
+    }
+    if res['errcode']:
+        return res, status.HTTP_401_UNAUTHORIZED
+    return res, status.HTTP_200_OK
 
 
 
