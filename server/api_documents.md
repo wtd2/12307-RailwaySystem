@@ -15,20 +15,20 @@ password: str
 ```json
 GET /api/login?username=admin&password=123456
 {
-	"errcode": 0,
+  "errcode": 0,
   "errmsg": "",
   "token" : "123456",
-	"privilege": 1
+  "privilege": 1
 }
 ```
 
 ```json
 GET /api/login?username=admin123&password=123456
 {
-	"errcode": 1,
+  "errcode": 1,
   "errmsg": "No such user",
   "token" : "",
-	"privilege": -1
+  "privilege": -1
 }
 ```
 
@@ -45,15 +45,15 @@ password: str
 ```json
 GET /api/signup?username=wtd2&password=123456
 {
-	"errcode": 0,
-	"errmsg": ""
+  "errcode": 0,
+  "errmsg": ""
 }
 ```
 
 ```json
 GET /api/signup?username=admin&password=123456
 {
-	"errcode": 1,
+  "errcode": 1,
   "errmsg": "User exists"
 }
 ```
@@ -75,7 +75,7 @@ exact: int (0 or 1)
 ```json
 GET /api/query?dep=WAR&arr=SHH&date=20200515&exact=1
 {
- 	"errcode": 0,
+   "errcode": 0,
   "errmsg": "",
   "result_cnt": 1,
   "result": [
@@ -118,7 +118,7 @@ exact: int (0 or 1)
 ```json
 GET /api/query?dep=WAR&arr=ENH&exact=1
 {
- 	"errcode": 0,
+   "errcode": 0,
   "errmsg": "",
   "result_cnt": 1,
   "result": [
@@ -153,9 +153,9 @@ arr_idx: int
 ```json
 GET /api/price?train_id=1234&dep_idx=1&arr_idx=20
 {
- 	"errcode": 0,
+   "errcode": 0,
   "errmsg": "",
-	"train_num": "Z42",
+  "train_num": "Z42",
   "dep_station": "乌鲁木齐",
   "arr_station": "上海",
   "result_cnt": 4,
@@ -195,7 +195,7 @@ GET api/passenger
 ```json
 GET /api/passenger
 {
- 	"errcode": 0,
+   "errcode": 0,
   "errmsg": "",
   "result_cnt": 2,
   "result": [
@@ -226,7 +226,7 @@ GET api/orderlist
 ```json
 GET /api/orderlist
 {
- 	"errcode": 0,
+   "errcode": 0,
   "errmsg": "",
   "result_cnt": 1,
   "result": [
@@ -234,8 +234,8 @@ GET /api/orderlist
       "order_id": 30,
       "passenger_name": "张三",
       "train_num": "Z42",
-  		"dep_station": "乌鲁木齐",
-  		"arr_station": "上海",
+      "dep_station": "乌鲁木齐",
+      "arr_station": "上海",
       "seat_no": "1车001号",
       "seat_type": "硬座",
       "seat_price": 385.5,
@@ -264,20 +264,20 @@ passenger_id: int
 ```json
 GET /api/purchase?train_id=1234&dep_idx=1&arr_idx=20&date=20200516&type_id=1&passenger_id=1
 {
- 	"errcode": 0,
+   "errcode": 0,
   "errmsg": "",
   "seat_no": "1车001号",
-	"order_id": 30
+  "order_id": 30
 }
 ```
 
 ```json
 GET /api/purchase?train_id=1234&dep_idx=1&arr_idx=20&date=20200515&type_id=1&passenger_id=1
 {
- 	"errcode": 1,
+   "errcode": 1,
   "errmsg": "余票不足",
   "seat_no": "",
-	"order_id": -1
+  "order_id": -1
 }
 ```
 
@@ -293,7 +293,7 @@ order_id: int
 ```json
 GET /api/refund?order_id=30
 {
- 	"errcode": 0,
+   "errcode": 0,
   "errmsg": ""
 }
 ```
@@ -301,7 +301,7 @@ GET /api/refund?order_id=30
 ```json
 GET /api/refund?order_id=29
 {
- 	"errcode": 1,
+   "errcode": 1,
   "errmsg": "无对应订单"
 }
 ```
@@ -320,7 +320,7 @@ phone: str
 ```json
 GET /api/addpassenger?name=张三&idcard=11010119260817001X&phone=13800138000
 {
- 	"errcode": 0,
+   "errcode": 0,
   "errmsg": ""
 }
 ```
@@ -328,7 +328,7 @@ GET /api/addpassenger?name=张三&idcard=11010119260817001X&phone=13800138000
 ```json
 GET /api/addpassenger?name=张三&idcard=11010119260817001X&phone=13800138000
 {
- 	"errcode": 1,
+   "errcode": 1,
   "errmsg": "乘车人已存在"
 }
 ```
@@ -345,7 +345,7 @@ passenger_id: int
 ```json
 GET /api/deletepassenger?passenger_id=1
 {
- 	"errcode": 0,
+   "errcode": 0,
   "errmsg": ""
 }
 ```
@@ -353,7 +353,7 @@ GET /api/deletepassenger?passenger_id=1
 ```json
 GET /api/deletepassenger?passenger_id=2
 {
- 	"errcode": 1,
+   "errcode": 1,
   "errmsg": "无权限"
 }
 ```
