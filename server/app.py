@@ -1,4 +1,4 @@
-from cli import *
+from cli import Service
 from flask import *
 from flask_api import FlaskAPI, status
 import secrets
@@ -191,6 +191,107 @@ def passenger():
         'errmsg': errmsg,
         'result_cnt': len(result),
         'result': result
+    }
+    if res['errcode']:
+        return res, status.HTTP_401_UNAUTHORIZED
+    return res, status.HTTP_200_OK
+
+
+@app.route("/api/orderlist", methods=['GET', 'POST'])
+def order():
+    try:
+        seat = [['二等座', '一等座', '商务座', '硬卧', '软卧'], ['硬座', '软座', '商务座', '硬卧', '软卧']]
+        token = request.cookies.get('12307_token')
+        result = []
+        if token not in uuid:
+            raise Exception('Unauthorized')
+        s = uuid[token]
+        q = s.order_query()
+        for row in q:
+            ch = 0 if row[12] else 1
+            result.append({
+                'order_id': row[0],
+                'passenger_name': row[2],
+                'train_num': row[1],
+                'dep_station': row[3],
+                'arr_station': row[4],
+                'seat_no': str(row[8]) + '车' + row[9] + '号',
+                'seat_price': row[5],
+                'seat_type': seat[ch][row[7] - 1],
+                'purchase_time': row[6],
+                'dep_time': row[10],
+                'arr_time': row[11]
+            })
+        errcode = 0
+        errmsg = ''
+    except Exception as e:
+        result = []
+        errcode = 1
+        errmsg = str(e)
+    res = {
+        'errcode': errcode,
+        'errmsg': errmsg,
+        'result_cnt': len(result),
+        'result': result
+    }
+    if res['errcode']:
+        return res, status.HTTP_401_UNAUTHORIZED
+    return res, status.HTTP_200_OK
+
+
+@app.route("/api/purchase", methods=['GET', 'POST'])
+def purchase():
+    try:
+        train = request.args.get('train_id')
+        dep = request.args.get('dep_idx')
+        arr = request.args.get('arr_idx')
+        date = request.args.get('date')
+        type = request.args.get('type_id')
+        passen = request.args.get('passenger_id')
+        token = request.cookies.get('12307_token')
+        if token not in uuid:
+            raise Exception('Unauthorized')
+        s = uuid[token]
+        q = s.purchase_ticket(train, dep, arr, date, type, passen)
+        orderid = q[3]
+        seatno = str(str(q[1]) + '车' + q[2] + '号')
+        errcode = 0
+        errmsg = ''
+
+    except Exception as e:
+        errcode = 1
+        errmsg = str(e)
+        seatno = ''
+        orderid = -1
+    res = {
+        'errcode': errcode,
+        'errmsg': errmsg,
+        'seat_no': seatno,
+        'order_id': orderid
+    }
+    if res['errcode']:
+        return res, status.HTTP_401_UNAUTHORIZED
+    return res, status.HTTP_200_OK
+
+
+@app.route("/api/refund", methods=['GET', 'POST'])
+def refund():
+    try:
+        orderid = request.args.get('order_id')
+        token = request.cookies.get('12307_token')
+        if token not in uuid:
+            raise Exception('Unauthorized')
+        s = uuid[token]
+        q = s.refund_ticket(orderid)
+        errcode = 0
+        errmsg = ''
+
+    except Exception as e:
+        errcode = 1
+        errmsg = str(e)
+    res = {
+        'errcode': errcode,
+        'errmsg': errmsg
     }
     if res['errcode']:
         return res, status.HTTP_401_UNAUTHORIZED
