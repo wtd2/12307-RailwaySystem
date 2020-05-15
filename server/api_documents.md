@@ -54,20 +54,20 @@ GET /api/logout
 GET /api/logout
 {
   "errcode": 1,
-  "errmsg": "Token invalid"
+  "errmsg": "token invalid"
 }
 ```
 
-#### islogin
+#### status
 
 ```
-GET api/islogin
+GET api/status
 ```
 
 判断当前是否有账户登陆。errcode为0则登陆，否则未登录。
 
 ```json
-GET /api/islogin
+GET /api/status
 {
   "errcode": 0,
   "errmsg": ""
@@ -75,10 +75,10 @@ GET /api/islogin
 ```
 
 ```json
-GET /api/islogin
+GET /api/status
 {
   "errcode": 1,
-  "errmsg": ""
+  "errmsg": "token invalid"
 }
 ```
 
