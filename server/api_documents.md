@@ -40,9 +40,7 @@ GET /api/login?username=admin123&password=123456
 GET api/logout
 ```
 
-提供username和password（明文），返回token。
-
-若errcode为0，则登陆成功；若errcode为1，则登陆失败，提示errmsg。若privilege为1，则具有管理员权限。
+登出当前账户。
 
 ```json
 GET /api/logout
