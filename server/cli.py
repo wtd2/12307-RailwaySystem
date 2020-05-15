@@ -216,6 +216,7 @@ class Service:
         cursor.execute(stmt, (self.id, ))
         res = cursor.fetchall()
         cursor.close()
+        self.cp.putconn(conn)
         return res
 
     def purchase_main(self):
