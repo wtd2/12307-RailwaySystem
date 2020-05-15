@@ -17,7 +17,7 @@ GET /api/login?username=admin&password=123456
 {
 	"errcode": 0,
   "errmsg": "",
-	"token" : "123456",
+  "token" : "123456",
 	"privilege": 1
 }
 ```
