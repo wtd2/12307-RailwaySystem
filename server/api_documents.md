@@ -140,7 +140,7 @@ exact: int (0 or 1)
 类似余票查询，查询两站（或两地）间中转路线。
 
 ```json
-GET /api/query?dep=WAR&arr=ENH&exact=1
+GET /api/transfer?dep=WAR&arr=ENH&exact=1
 {
   "errcode": 0,
   "errmsg": "",
@@ -154,8 +154,8 @@ GET /api/query?dep=WAR&arr=ENH&exact=1
       "arr_station": "合肥南",
       "first_dep_time": "19:31",
       "first_arr_time": "11:59",
-      "first_dep_time": "15:44",
-      "first_arr_time": "17:52",
+      "second_dep_time": "15:44",
+      "second_arr_time": "17:52",
       "total_time": 2781,
       "transfer_time": 225
     }
