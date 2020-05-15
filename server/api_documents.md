@@ -1,6 +1,6 @@
 ## 12307-API 格式
 
-上线api: *login, query, price, passenger*
+上线api: *login, logout, status, query, price, passenger, orderlist, purchase, refund*
 
 #### login
 
@@ -79,32 +79,6 @@ GET /api/status
 {
   "errcode": 1,
   "errmsg": "token invalid"
-}
-```
-
-#### signup
-
-```
-GET api/signup
-username: str
-password: str
-```
-
-提供username和password，进行账户注册。
-
-```json
-GET /api/signup?username=wtd2&password=123456
-{
-  "errcode": 0,
-  "errmsg": ""
-}
-```
-
-```json
-GET /api/signup?username=admin&password=123456
-{
-  "errcode": 1,
-  "errmsg": "User exists"
 }
 ```
 
