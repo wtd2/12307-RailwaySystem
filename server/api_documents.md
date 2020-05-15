@@ -1,6 +1,6 @@
 ## 12307-API 格式
 
-上线api: *login, logout, status, query, price, passenger, orderlist, purchase, refund*
+上线api: *login, logout, status, query, price, passenger, orderlist, purchase, refund, addpassenger, editpassenger, deletepassenger*
 
 #### login
 
@@ -354,6 +354,34 @@ GET /api/addpassenger?name=张三&idcard=11010119260817001X&phone=13800138000
 {
   "errcode": 1,
   "errmsg": "乘车人已存在"
+}
+```
+
+#### editpassenger
+
+```
+GET api/editpassenger
+id: str
+name: str
+idcard: str
+phone: str
+```
+
+提供乘车人编号和全部信息，编辑乘车人信息。
+
+```json
+GET /api/editpassenger?id=1&name=张三&idcard=11010119260817001X&phone=13800138000
+{
+  "errcode": 0,
+  "errmsg": ""
+}
+```
+
+```json
+GET /api/editpassenger?id=2&name=张三&idcard=11010119260817001X&phone=13800138000
+{
+  "errcode": 1,
+  "errmsg": "No such privilege"
 }
 ```
 
