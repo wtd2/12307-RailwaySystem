@@ -124,6 +124,50 @@ def query():
     return res, status.HTTP_200_OK
 
 
+@app.route("/api/transfer", methods=['GET', 'POST'])
+def transfer():
+    try:
+        dep = request.args.get('dep')
+        arr = request.args.get('arr')
+        exact = int(request.args.get('exact'))
+        token = request.cookies.get('12307_token')
+        result = []
+        if token not in uuid:
+            raise Exception('Unauthorized')
+        s = uuid[token]
+        q = s.transfer_query(dep, arr, exact)
+        for row in q:
+            cur = {
+                'first_train': row[2],
+                'second_train': row[6],
+                'dep_station': row[0],
+                'via_station': row[4],
+                'arr_station': row[8],
+                'first_dep_time': row[1],
+                'first_arr_time': row[3],
+                'second_dep_time': row[5],
+                'second_arr_time': row[7],
+                'total_time': row[9],
+                'transfer_time': row[10]
+            }
+            result.append(cur)
+        errcode = 0
+        errmsg = ''
+    except Exception as e:
+        result = []
+        errcode = 1
+        errmsg = str(e)
+    res = {
+        'errcode': errcode,
+        'errmsg': errmsg,
+        'result_cnt': len(result),
+        'result': result
+    }
+    if res['errcode']:
+        return res, status.HTTP_401_UNAUTHORIZED
+    return res, status.HTTP_200_OK
+
+
 @app.route("/api/price", methods=['GET', 'POST'])
 def price():
     train_no = ''
