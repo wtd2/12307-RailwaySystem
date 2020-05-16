@@ -85,6 +85,34 @@ def login_status():
     return res, status.HTTP_200_OK
 
 
+@app.route("/api/station", methods=['GET', 'POST'])
+def station():
+    try:
+        token = request.cookies.get('12307_token')
+        result = []
+        if token not in uuid:
+            raise Exception('Unauthorized')
+        s = uuid[token]
+        q = s.station_list()
+        for row in q:
+            result.append({'code': row[0], 'station': row[1], 'city': row[2], 'province': row[3]})
+        errcode = 0
+        errmsg = ''
+    except Exception as e:
+        result = []
+        errcode = 1
+        errmsg = str(e)
+    res = {
+        'errcode': errcode,
+        'errmsg': errmsg,
+        'result_cnt': len(result),
+        'result': result
+    }
+    if res['errcode']:
+        return res, status.HTTP_401_UNAUTHORIZED
+    return res, status.HTTP_200_OK
+
+
 @app.route("/api/query", methods=['GET', 'POST'])
 def query():
     try:

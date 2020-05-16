@@ -33,6 +33,16 @@ class Service:
         self.admin = result[0][3]
         return True
 
+    def station_list(self):
+        stmt = "select si.code, si.station, si.city, cp.province from station_info si join city_province cp on si.city = cp.city"
+        conn = self.cp.getconn()
+        cursor = conn.cursor()
+        cursor.execute(stmt)
+        result = cursor.fetchall()
+        cursor.close()
+        self.cp.putconn(conn)
+        return result
+
     def remain_query(self, dep: str, arr: str, date: str, exact: int = 1):
         if exact:
             stmt = "select ti.seat_type, t.train_id, t.dep, t.arr, t.shown_code, t1.station, t2.station," \
