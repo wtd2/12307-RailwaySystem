@@ -82,6 +82,37 @@ GET /api/status
 }
 ```
 
+#### station
+
+```json
+GET api/station
+```
+
+获取当前车站列表。
+
+```json
+GET /api/station
+{
+  "errcode": 0,
+  "errmsg": "",
+  "result_cnt": 2,
+  "result": [
+    {
+      "code": "SHH",
+      "station": "上海",
+      "city": "上海市",
+      "province": "上海市"
+    },
+    {
+      "code": "IOQ",
+      "station": "深圳北",
+      "city": "深圳市",
+      "province": "广东省"
+    }
+  ]
+}
+```
+
 #### query
 
 ```
