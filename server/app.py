@@ -206,20 +206,21 @@ def price():
         train = request.args.get('train_id')
         dep = request.args.get('dep_idx')
         arr = request.args.get('arr_idx')
+        date = request.args.get('date')
         token = request.cookies.get('12307_token')
         result = []
         if token not in uuid:
             raise Exception('Unauthorized')
         s = uuid[token]
-        q = s.price_query(train, dep, arr)
-        ch = 0 if q[0][0] else 1
-        train_no = q[0][1]
-        dep_sta = q[0][2]
-        arr_sta = q[0][3]
-        for i in range(0, 4):
-            if q[0][7 + i] is None:
+        q = s.price_query(train, dep, arr, date)
+        ch = 0 if q[0] else 1
+        train_no = q[1]
+        dep_sta = q[2]
+        arr_sta = q[3]
+        for i in range(0, 5):
+            if q[7 + i] is None:
                 continue
-            result.append({'type_id': i + 1, 'type_name': seat[ch][i], 'price': q[0][7 + i]})
+            result.append({'type_id': i + 1, 'type_name': seat[ch][i], 'price': q[7 + i], 'ticket': q[12 + i]})
         errcode = 0
         errmsg = ''
 
