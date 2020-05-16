@@ -1,6 +1,8 @@
 ## 12307-API 格式
 
-上线api: *login, logout, status, query, price, passenger, orderlist, purchase, refund, addpassenger, editpassenger, deletepassenger*
+上线api: 文档内全部上线
+
+Url: http://sh.wtd2.top:81/api/
 
 #### login
 
@@ -120,10 +122,10 @@ GET api/query
 dep: str
 arr: str
 date: str, format(YYYYMMDD)
-exact: int (0 or 1)
+exact: int (0, 1, 2)
 ```
 
-提供出发车站和到达车站对应代码（三位大写字母），出发日期（按照YYYYMMDD格式），精确查询（0按城市查询，1按车站查询），token。
+提供出发车站和到达车站对应代码（三位大写字母），出发日期（按照YYYYMMDD格式），精确查询（0按城市查询，1按车站查询，2按照dep\*到arr\*站模糊查询），token。
 
 返回余票查询结果，其中train_id, dep_idx, arr_idx用来完成后续购票的交互。提供硬座/二等座，软座/一等座，商务座，硬卧，软卧的票价和余票，若该座位不存在返回-1。
 
@@ -165,7 +167,7 @@ GET /api/query?dep=WAR&arr=SHH&date=20200515&exact=1
 GET api/transfer
 dep: str
 arr: str
-exact: int (0 or 1)
+exact: int (0, 1, 2)
 ```
 
 类似余票查询，查询两站（或两地）间中转路线。
@@ -201,12 +203,13 @@ GET api/price
 train_id: int
 dep_idx: int
 arr_idx: int
+date: str
 ````
 
 提供train_id, dep_idx, arr_idx, token, 返回座位种类和票价信息。
 
 ```json
-GET /api/price?train_id=1234&dep_idx=1&arr_idx=20
+GET /api/price?train_id=1234&dep_idx=1&arr_idx=20&date=20200515
 {
   "errcode": 0,
   "errmsg": "",
@@ -218,22 +221,26 @@ GET /api/price?train_id=1234&dep_idx=1&arr_idx=20
     {
       "type_id": 1,
       "type_name": "硬座",
-      "price": 385.5
+      "price": 385.5,
+      "ticket": 0
     },
     {
       "type_id": 2,
       "type_name": "软座",
-      "price": 615.5
+      "price": 615.5,
+      "ticket": 0
     },
     {
       "type_id": 4,
       "type_name": "硬卧",
-      "price": 695.5
+      "price": 695.5,
+      "ticket": 0
     },
     {
       "type_id": 5,
       "type_name": "软卧",
-      "price": 1075.5
+      "price": 1075.5,
+      "ticket": 0
     }
   ]
 }
