@@ -146,6 +146,7 @@ GET /api/query?dep=WAR&arr=SHH&date=20200515&exact=1
       "dep_time": "19:31",
       "arr_time": "11:59",
       "total_time": 2428,
+      "remain": 0,
       "ticket_yz": 0,
       "price_yz": 385.5,
       "ticket_rz": 0,
@@ -156,6 +157,56 @@ GET /api/query?dep=WAR&arr=SHH&date=20200515&exact=1
       "price_yw": 695.5,
       "ticket_rw": 0,
       "price_rw": 1075.5
+    }
+  ]
+}
+```
+
+#### timetable
+
+```
+GET api/timetable
+train_id: str
+```
+
+提供train_id，获取详细时刻表信息。
+
+``` json
+GET /api/timetable?train_id=123
+{
+  "errcode": 0,
+  "errmsg": "",
+  "result_cnt": 2,
+  "result": [
+    {
+      "station_idx": 1,
+      "arr_time": "--:--",
+      "dep_time": "15:44",
+      "arr_day": 0,
+      "dep_day": 0,
+      "duration": -1,
+      "station": "上海",
+      "code": "G7252"
+    },
+    {
+      "station_idx": 2,
+      "arr_time": "16:57",
+      "dep_time": "17:00",
+      "arr_day": 0,
+      "dep_day": 0,
+      "duration": 3,
+      "station": "南京南",
+      "code": "G7253"
+    },
+    {
+      "station_idx": 3,
+      "arr_time": "17:52",
+      "dep_time": "--:--",
+      "arr_day": 0,
+      "dep_day": 0,
+      "duration": -1,
+      "station": "合肥南",
+      "code": ""
     }
   ]
 }
@@ -295,6 +346,7 @@ GET /api/orderlist
     {
       "order_id": 30,
       "passenger_name": "张三",
+      "idcard": "11010119260817001X",
       "train_num": "Z42",
       "dep_station": "乌鲁木齐",
       "arr_station": "上海",
