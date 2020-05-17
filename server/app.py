@@ -131,7 +131,7 @@ def query():
             for i in range(10, 15):
                 remain += price_auth(row[i], row[i + 5])[2]
             cur = {'train_id': row[1], 'dep_idx': row[2], 'arr_idx': row[3], 'train_num': row[4], 'dep_station': row[5],
-                   'arr_station': row[6], 'dep_time': row[7], 'arr_time': row[8], 'total_time': row[9],
+                   'arr_station': row[6], 'dep_time': row[7], 'arr_time': row[8], 'total_time': row[9], 'remain': remain,
                    'price_yz': price_auth(row[10], row[15])[0], 'ticket_yz': price_auth(row[10], row[15])[1],
                    'price_rz': price_auth(row[11], row[16])[0], 'ticket_rz': price_auth(row[11], row[16])[1],
                    'price_sw': price_auth(row[12], row[17])[0], 'ticket_sw': price_auth(row[12], row[17])[1],
