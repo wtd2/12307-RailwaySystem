@@ -1,6 +1,6 @@
 ## 12307-API 格式
 
-上线api: 文档内全部上线
+上线api: 除 *timetable* 均已上线
 
 Url: http://sh.wtd2.top:81/api/
 
@@ -176,7 +176,7 @@ GET /api/timetable?train_id=123
 {
   "errcode": 0,
   "errmsg": "",
-  "result_cnt": 2,
+  "result_cnt": 3,
   "result": [
     {
       "station_idx": 1,
@@ -346,7 +346,7 @@ GET /api/orderlist
     {
       "order_id": 30,
       "passenger_name": "张三",
-      "idcard": "11010119260817001X",
+      "passenger_idcard": "11010119260817001X",
       "train_num": "Z42",
       "dep_station": "乌鲁木齐",
       "arr_station": "上海",
