@@ -166,13 +166,13 @@ GET /api/query?dep=WAR&arr=SHH&date=20200515&exact=1
 
 ```
 GET api/timetable
-train_id: str
+train_code: str
 ```
 
-提供train_id，获取详细时刻表信息。
+提供train_code，获取详细时刻表信息。
 
 ``` json
-GET /api/timetable?train_id=123
+GET /api/timetable?train_code=G7253
 {
   "errcode": 0,
   "errmsg": "",

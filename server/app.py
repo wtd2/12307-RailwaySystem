@@ -113,6 +113,45 @@ def station():
     return res, status.HTTP_200_OK
 
 
+@app.route("/api/timetable", methods=['GET', 'POST'])
+def timetable():
+    try:
+        code = request.args.get('train_code')
+        token = request.cookies.get('12307_token')
+        result = []
+        if token not in uuid:
+            raise Exception('Unauthorized')
+        s = uuid[token]
+        q = s.timetable_query(code)
+        for row in q:
+            cur = {
+                'station_idx': row[0],
+                'arr_time': row[3] if row[3] is not None else '--:--',
+                'dep_time': row[4] if row[4] is not None else '--:--',
+                'arr_day': row[5] if row[5] is not None else row[6],
+                'dep_day': row[6] if row[6] is not None else row[5],
+                'duration': int(row[7]) if row[7] is not None else -1,
+                'station': row[2],
+                'code': row[1]
+            }
+            result.append(cur)
+        errcode = 0
+        errmsg = ''
+    except Exception as e:
+        result = []
+        errcode = 1
+        errmsg = str(e)
+    res = {
+        'errcode': errcode,
+        'errmsg': errmsg,
+        'result_cnt': len(result),
+        'result': result
+    }
+    if res['errcode']:
+        return res, status.HTTP_401_UNAUTHORIZED
+    return res, status.HTTP_200_OK
+
+
 @app.route("/api/query", methods=['GET', 'POST'])
 def query():
     try:
@@ -130,13 +169,19 @@ def query():
             remain = 0
             for i in range(10, 15):
                 remain += price_auth(row[i], row[i + 5])[2]
+            pr = 1e9
+            for i in range(10, 15):
+                if row[i] is not None:
+                    pr = min(pr, row[i])
             cur = {'train_id': row[1], 'dep_idx': row[2], 'arr_idx': row[3], 'train_num': row[4], 'dep_station': row[5],
                    'arr_station': row[6], 'dep_time': row[7], 'arr_time': row[8], 'total_time': row[9], 'remain': remain,
                    'price_yz': price_auth(row[10], row[15])[0], 'ticket_yz': price_auth(row[10], row[15])[1],
                    'price_rz': price_auth(row[11], row[16])[0], 'ticket_rz': price_auth(row[11], row[16])[1],
                    'price_sw': price_auth(row[12], row[17])[0], 'ticket_sw': price_auth(row[12], row[17])[1],
                    'price_yw': price_auth(row[13], row[18])[0], 'ticket_yw': price_auth(row[13], row[18])[1],
-                   'price_rw': price_auth(row[14], row[19])[0], 'ticket_rw': price_auth(row[14], row[19])[1]}
+                   'price_rw': price_auth(row[14], row[19])[0], 'ticket_rw': price_auth(row[14], row[19])[1],
+                   'price': pr
+                   }
             result.append(cur)
         errcode = 0
         errmsg = ''
@@ -288,6 +333,7 @@ def order():
             result.append({
                 'order_id': row[0],
                 'passenger_name': row[2],
+                'passenger_idcard': row[13],
                 'train_num': row[1],
                 'dep_station': row[3],
                 'arr_station': row[4],
@@ -296,7 +342,7 @@ def order():
                 'seat_type': seat[ch][row[7] - 1],
                 'purchase_time': row[6],
                 'dep_time': row[10],
-                'arr_time': row[11]
+                'arr_time': row[11],
             })
         errcode = 0
         errmsg = ''

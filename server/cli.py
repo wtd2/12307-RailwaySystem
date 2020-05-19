@@ -1,12 +1,15 @@
-import psycopg2, time, hashlib, re
-from psycopg2.pool import SimpleConnectionPool
+import hashlib
+import re
+
 from prettytable import PrettyTable
+from psycopg2.pool import SimpleConnectionPool
 
 
 class Service:
 
-    def __init__(self, username: str, password: str, public = False):
-        self.cp = SimpleConnectionPool(1, 5, user="postgres", password="2017ustc", host="sh.wtd2.top", port="5432", database="12306")
+    def __init__(self, username: str, password: str, public=False):
+        self.cp = SimpleConnectionPool(1, 5, user="postgres", password="2017ustc", host="sh.wtd2.top", port="5432",
+                                       database="12306")
         if not public:
             self.password_check(username, password.encode('utf-8'))
             self.passenger_info()
@@ -19,7 +22,7 @@ class Service:
         stmt = "select * from user_info where user_name = %s"
         conn = self.cp.getconn()
         cursor = conn.cursor()
-        cursor.execute(stmt, (username, ))
+        cursor.execute(stmt, (username,))
         result = cursor.fetchall()
         cursor.close()
         self.cp.putconn(conn)
@@ -116,7 +119,9 @@ class Service:
         cursor.execute(stmt, (train, dep, arr))
         result = cursor.fetchall()[0]
         stmt = 'select remain_query(%s, %s, %s, 1, %s), remain_query(%s, %s, %s, 2, %s), remain_query(%s, %s, %s, 3, %s), remain_query(%s, %s, %s, 4, %s), remain_query(%s, %s, %s, 5, %s);'
-        cursor.execute(stmt, (train, dep, arr, date, train, dep, arr, date, train, dep, arr, date, train, dep, arr, date, train, dep, arr, date))
+        cursor.execute(stmt, (
+            train, dep, arr, date, train, dep, arr, date, train, dep, arr, date, train, dep, arr, date, train, dep, arr,
+            date))
         result = result + cursor.fetchall()[0]
         cursor.close()
         self.cp.putconn(conn)
@@ -126,7 +131,7 @@ class Service:
         stmt = "select passenger_id, passenger_name, idcard_number, phone_number from passenger_info where related_user = %s and shown = true order by passenger_id;"
         conn = self.cp.getconn()
         cursor = conn.cursor()
-        cursor.execute(stmt, (self.id, ))
+        cursor.execute(stmt, (self.id,))
         self.passenger = cursor.fetchall()
         cursor.close()
         self.cp.putconn(conn)
@@ -153,7 +158,7 @@ class Service:
             return None
         order_no = cursor.fetchall()[0][0]
         stmt = "select to_char(si.dep_date, 'YYYY年MM月DD日'), si.seat_cabin, si.seat_code from order_info oi join seat_info si on oi.train_id = si.train_id and oi.seat_id = si.seat_no where order_id = %s;"
-        cursor.execute(stmt, (order_no, ))
+        cursor.execute(stmt, (order_no,))
         res = cursor.fetchall()
         conn.commit()
         cursor.close()
@@ -174,7 +179,7 @@ class Service:
         conn = self.cp.getconn()
         cursor = conn.cursor()
         try:
-            cursor.execute(stmt, (order_no, ))
+            cursor.execute(stmt, (order_no,))
         except Exception as e:
             cursor.close()
             self.cp.putconn(conn)
@@ -185,10 +190,10 @@ class Service:
         return True
 
     def timetable_query(self, train: str):
-        stmt = "select coalesce(t.code_shown, ti.train_full_name) as number, (s.station || '(' || s.city || ')') as station, t.arr_time as arrive, t.dep_time as depart from timetable t  join station_info s on t.station_code = s.code  join train_info ti on t.train_id = ti.train_id  left join interval_price ip on t.train_id = ip.train_id and ip.dep_idx = 1 and ip.arr_idx = t.station_idx  where t.train_id in (      select distinct train_id from timetable      where code_shown like %s)  and t.station_idx >= 1  order by t.station_idx;"
+        stmt = "select t.station_idx, coalesce(t.code_shown, ti.train_full_name),s.station, to_char(t.arr_time, 'HH24:MI'),to_char(t.dep_time, 'HH24:MI'), t.day_arr, t.day_dep, extract(epoch from (t.dep_time - t.arr_time) + (t.day_dep - t.day_arr) * '1 day'::interval) / 60 from timetable t join station_info s on t.station_code = s.code join train_info ti on t.train_id = ti.train_id left join interval_price ip on t.train_id = ip.train_id and ip.dep_idx = 1 and ip.arr_idx = t.station_idx where t.train_id in (select distinct train_id from timetable where code_shown like %s) and t.station_idx >= 1 and t.station_shown order by t.station_idx;"
         conn = self.cp.getconn()
         cursor = conn.cursor()
-        cursor.execute(stmt, (train, ))
+        cursor.execute(stmt, (train,))
         result = cursor.fetchall()
         cursor.close()
         self.cp.putconn(conn)
@@ -216,7 +221,7 @@ class Service:
         stmt = "update passenger_info set shown = false where passenger_id = %s;"
         conn = self.cp.getconn()
         cursor = conn.cursor()
-        cursor.execute(stmt, (num, ))
+        cursor.execute(stmt, (num,))
         conn.commit()
         cursor.close()
         self.cp.putconn(conn)
@@ -240,10 +245,10 @@ class Service:
         self.cp.putconn(conn)
 
     def order_query(self):
-        stmt = "select oi.order_id as id, t1.code_shown as num, pi.passenger_name as name, s1.station as dep, s2.station as arr, oi.order_price as price, to_char(oi.create_time, 'YYYY-MM-DD HH24:MI') as create_time, si.seat_type, si.seat_cabin, si.seat_code, to_char(oi.dep_date::timestamp + t1.day_dep * '1 day'::interval + t1.dep_time, 'YYYY-MM-DD HH24:MI') as dt, to_char(oi.dep_date::timestamp + t2.day_arr * '1 day'::interval + t2.arr_time, 'YYYY-MM-DD HH24:MI') as at, ti.seat_type from order_info oi join passenger_info pi on oi.passenger_id = pi.passenger_id join timetable t1 on oi.train_id = t1.train_id and oi.dep_idx = t1.station_idx join timetable t2 on oi.train_id = t2.train_id and oi.arr_idx = t2.station_idx join station_info s1 on t1.station_code = s1.code join station_info s2 on t2.station_code = s2.code join seat_info si on oi.train_id = si.train_id and oi.seat_id = si.seat_no and oi.dep_date = si.dep_date join train_info ti on oi.train_id = ti.train_id where oi.passenger_id in (select oi.passenger_id from passenger_info where pi.related_user = %s) and oi.order_status = 1 order by order_id;"
+        stmt = "select oi.order_id as id, t1.code_shown as num, pi.passenger_name as name, s1.station as dep, s2.station as arr, oi.order_price as price, to_char(oi.create_time, 'YYYY-MM-DD HH24:MI') as create_time, si.seat_type, si.seat_cabin, si.seat_code, to_char(oi.dep_date::timestamp + t1.day_dep * '1 day'::interval + t1.dep_time, 'YYYY-MM-DD HH24:MI') as dt, to_char(oi.dep_date::timestamp + t2.day_arr * '1 day'::interval + t2.arr_time, 'YYYY-MM-DD HH24:MI') as at, ti.seat_type, pi.idcard_number from order_info oi join passenger_info pi on oi.passenger_id = pi.passenger_id join timetable t1 on oi.train_id = t1.train_id and oi.dep_idx = t1.station_idx join timetable t2 on oi.train_id = t2.train_id and oi.arr_idx = t2.station_idx join station_info s1 on t1.station_code = s1.code join station_info s2 on t2.station_code = s2.code join seat_info si on oi.train_id = si.train_id and oi.seat_id = si.seat_no and oi.dep_date = si.dep_date join train_info ti on oi.train_id = ti.train_id where oi.passenger_id in (select oi.passenger_id from passenger_info where pi.related_user = %s) and oi.order_status = 1 order by order_id desc;"
         conn = self.cp.getconn()
         cursor = conn.cursor()
-        cursor.execute(stmt, (self.id, ))
+        cursor.execute(stmt, (self.id,))
         res = cursor.fetchall()
         cursor.close()
         self.cp.putconn(conn)
@@ -266,7 +271,7 @@ class Service:
                 else:
                     line.append('----')
             tb.add_row(line)
-        tb.add_row(['0','EXIT'] + ['' for i in range(0, 10)])
+        tb.add_row(['0', 'EXIT'] + ['' for i in range(0, 10)])
         print(tb)
         idx = int(input('请选择购票车次的序号:'))
         while idx < 1 or idx > cnt:
@@ -303,7 +308,8 @@ class Service:
                     seatname = ['二等座', '一等座', '商务座', '', '']
                 else:
                     seatname = ['硬座', '软座', '', '硬卧', '软卧']
-                print('购票成功, {}成功购买{}{}次{}车票, 座位号{}车{}号!'.format(self.passenger[passenger][1], res[0], row[4], seatname[hierarchy - 1], res[1], res[2]))
+                print('购票成功, {}成功购买{}{}次{}车票, 座位号{}车{}号!'.format(self.passenger[passenger][1], res[0], row[4],
+                                                                 seatname[hierarchy - 1], res[1], res[2]))
                 complete = input('请支付{}元,是否支付成功[Y/N]:'.format(row[hierarchy - 11]))
                 if complete.lower() == 'y':
                     input('完成购票, 订单号{}'.format(res[3]))
@@ -318,7 +324,7 @@ class Service:
         res = self.timetable_query(train)
         tb = PrettyTable(['车次', '车站', '到达时刻', '出发时刻'])
         for row in res:
-            tb.add_row([x if x is not None else '--:--:--' for x in row])
+            tb.add_row([x if x is not None else '--:--' for x in row])
         input(tb)
 
     def passenger_manage_main(self):
@@ -402,8 +408,3 @@ class Service:
                 res = int(input('请选择服务功能:'))
                 if res == 0:
                     return
-
-
-if __name__ == '__main__':
-    user = Service('admin', '123456')
-    user.welcome()
