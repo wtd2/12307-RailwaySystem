@@ -2,6 +2,8 @@ from cli import Service
 from flask import *
 from flask_api import FlaskAPI, status
 import secrets
+from gevent.pywsgi import WSGIServer
+from gevent import monkey
 
 app = FlaskAPI(__name__)
 
@@ -499,5 +501,7 @@ def delete_passenger():
 
 
 if __name__ == '__main__':
-    db = Service('', '', public = True)
-    app.run(host='0.0.0.0', port = '1234', debug= True)
+    monkey.patch_all()
+    server = WSGIServer(('0.0.0.0', 1234), app)
+    server.serve_forever()
+    # app.run(host='0.0.0.0', port = '1234', debug= True)
