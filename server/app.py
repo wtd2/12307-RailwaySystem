@@ -505,7 +505,29 @@ def delete_passenger():
 
 @app.route("/api/register", methods=['GET', 'POST'])
 def register():
-    pass
+    try:
+        token = request.cookies.get('12307_token')
+        if token not in uuid:
+            raise Exception('Unauthorized')
+        if not uuid[token].admin:
+            raise Exception('No such privilege')
+        user = request.args.get('username')
+        password = request.args.get('password')
+        s = uuid[token]
+        s.register(user, bytes(password, encoding='utf8'))
+        errcode = 0
+        errmsg = ''
+
+    except Exception as e:
+        errcode = 1
+        errmsg = str(e)
+    res = {
+        'errcode': errcode,
+        'errmsg': errmsg
+    }
+    if res['errcode']:
+        return res, status.HTTP_401_UNAUTHORIZED
+    return res, status.HTTP_200_OK
 
 
 @app.route("/api/addstop", methods=['GET', 'POST'])
@@ -596,22 +618,9 @@ def remove_stop():
         if not uuid[token].admin:
             raise Exception('No such privilege')
         tid = request.args.get('train_id')
-        code = request.args.get('station_code')
         idx = request.args.get('station_idx')
-        if 'dep_time' not in request.args:
-            dep_time = None
-        else:
-            dt = int(request.args.get('dep_time'))
-            dep_time = '{}:{}'.format(dt // 60, dt % 60)
-        if 'arr_time' not in request.args:
-            arr_time = None
-        else:
-            at = int(request.args.get('arr_time'))
-            arr_time = '{}:{}'.format(at // 60, at % 60)
-        dep_day = request.args.get('dep_day') if 'dep_day' in request.args else None
-        arr_day = request.args.get('arr_day') if 'arr_day' in request.args else None
         s = uuid[token]
-        s.edit_stop(tid, idx, code, dep_time, arr_time, dep_day, arr_day)
+        s.remove_stop(tid, idx)
         errcode = 0
         errmsg = ''
 
