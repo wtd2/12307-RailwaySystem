@@ -73,12 +73,15 @@ def login_status():
         token = request.cookies.get('12307_token')
         if token not in uuid:
             raise Exception('token invalid {}'.format(token))
+        admin = int(uuid[token].admin)
         errcode = 0
         errmsg = ''
     except Exception as e:
+        admin = -1
         errcode = 1
         errmsg = str(e)
     res = {
+        'privilege': admin,
         'errcode': errcode,
         'errmsg': errmsg
     }
@@ -134,7 +137,8 @@ def timetable():
                 'dep_day': row[6] if row[6] is not None else row[5],
                 'duration': int(row[7]) if row[7] is not None else -1,
                 'station': row[2],
-                'code': row[1]
+                'code': row[1],
+                'train_id': row[8]
             }
             result.append(cur)
         errcode = 0
@@ -484,6 +488,130 @@ def delete_passenger():
         pid = request.args.get('passenger_id')
         s = uuid[token]
         s.delete_passenger(pid)
+        errcode = 0
+        errmsg = ''
+
+    except Exception as e:
+        errcode = 1
+        errmsg = str(e)
+    res = {
+        'errcode': errcode,
+        'errmsg': errmsg
+    }
+    if res['errcode']:
+        return res, status.HTTP_401_UNAUTHORIZED
+    return res, status.HTTP_200_OK
+
+
+@app.route("/api/register", methods=['GET', 'POST'])
+def register():
+    pass
+
+
+@app.route("/api/addstop", methods=['GET', 'POST'])
+def add_stop():
+    try:
+        token = request.cookies.get('12307_token')
+        if token not in uuid:
+            raise Exception('Unauthorized')
+        if not uuid[token].admin:
+            raise Exception('No such privilege')
+        tid = request.args.get('train_id')
+        code = request.args.get('station_code')
+        if 'dep_time' not in request.args:
+            dep_time = None
+        else:
+            dt = int(request.args.get('dep_time'))
+            dep_time = '{}:{}'.format(dt // 60, dt % 60)
+        if 'arr_time' not in request.args:
+            arr_time = None
+        else:
+            at = int(request.args.get('arr_time'))
+            arr_time = '{}:{}'.format(at // 60, at % 60)
+        dep_day = request.args.get('dep_day') if 'dep_day' in request.args else None
+        arr_day = request.args.get('arr_day') if 'arr_day' in request.args else None
+        s = uuid[token]
+        s.add_stop(tid, code, dep_time, arr_time, dep_day, arr_day)
+        errcode = 0
+        errmsg = ''
+
+    except Exception as e:
+        errcode = 1
+        errmsg = str(e)
+    res = {
+        'errcode': errcode,
+        'errmsg': errmsg
+    }
+    if res['errcode']:
+        return res, status.HTTP_401_UNAUTHORIZED
+    return res, status.HTTP_200_OK
+
+
+@app.route("/api/editstop", methods=['GET', 'POST'])
+def edit_stop():
+    try:
+        token = request.cookies.get('12307_token')
+        if token not in uuid:
+            raise Exception('Unauthorized')
+        if not uuid[token].admin:
+            raise Exception('No such privilege')
+        tid = request.args.get('train_id')
+        code = request.args.get('station_code')
+        idx = request.args.get('station_idx')
+        if 'dep_time' not in request.args:
+            dep_time = None
+        else:
+            dt = int(request.args.get('dep_time'))
+            dep_time = '{}:{}'.format(dt // 60, dt % 60)
+        if 'arr_time' not in request.args:
+            arr_time = None
+        else:
+            at = int(request.args.get('arr_time'))
+            arr_time = '{}:{}'.format(at // 60, at % 60)
+        dep_day = request.args.get('dep_day') if 'dep_day' in request.args else None
+        arr_day = request.args.get('arr_day') if 'arr_day' in request.args else None
+        s = uuid[token]
+        s.edit_stop(tid, idx, code, dep_time, arr_time, dep_day, arr_day)
+        errcode = 0
+        errmsg = ''
+
+    except Exception as e:
+        errcode = 1
+        errmsg = str(e)
+    res = {
+        'errcode': errcode,
+        'errmsg': errmsg
+    }
+    if res['errcode']:
+        return res, status.HTTP_401_UNAUTHORIZED
+    return res, status.HTTP_200_OK
+
+
+@app.route("/api/removestop", methods=['GET', 'POST'])
+def remove_stop():
+    try:
+        token = request.cookies.get('12307_token')
+        if token not in uuid:
+            raise Exception('Unauthorized')
+        if not uuid[token].admin:
+            raise Exception('No such privilege')
+        tid = request.args.get('train_id')
+        code = request.args.get('station_code')
+        idx = request.args.get('station_idx')
+        if 'dep_time' not in request.args:
+            dep_time = None
+        else:
+            dt = int(request.args.get('dep_time'))
+            dep_time = '{}:{}'.format(dt // 60, dt % 60)
+        if 'arr_time' not in request.args:
+            arr_time = None
+        else:
+            at = int(request.args.get('arr_time'))
+            arr_time = '{}:{}'.format(at // 60, at % 60)
+        dep_day = request.args.get('dep_day') if 'dep_day' in request.args else None
+        arr_day = request.args.get('arr_day') if 'arr_day' in request.args else None
+        s = uuid[token]
+        s.edit_stop(tid, idx, code, dep_time, arr_time, dep_day, arr_day)
         errcode = 0
         errmsg = ''
 

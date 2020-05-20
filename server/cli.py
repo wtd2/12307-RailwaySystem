@@ -191,7 +191,7 @@ class Service:
         return True
 
     def timetable_query(self, train: str):
-        stmt = "select t.station_idx, coalesce(t.code_shown, ti.train_full_name),s.station, to_char(t.arr_time, 'HH24:MI'),to_char(t.dep_time, 'HH24:MI'), t.day_arr, t.day_dep, extract(epoch from (t.dep_time - t.arr_time) + (t.day_dep - t.day_arr) * '1 day'::interval) / 60 from timetable t join station_info s on t.station_code = s.code join train_info ti on t.train_id = ti.train_id left join interval_price ip on t.train_id = ip.train_id and ip.dep_idx = 1 and ip.arr_idx = t.station_idx where t.train_id in (select distinct train_id from timetable where code_shown like %s) and t.station_idx >= 1 and t.station_shown order by t.station_idx;"
+        stmt = "select t.station_idx, coalesce(t.code_shown, ti.train_full_name),s.station, to_char(t.arr_time, 'HH24:MI'),to_char(t.dep_time, 'HH24:MI'), t.day_arr, t.day_dep, extract(epoch from (t.dep_time - t.arr_time) + (t.day_dep - t.day_arr) * '1 day'::interval) / 60, t.train_id from timetable t join station_info s on t.station_code = s.code join train_info ti on t.train_id = ti.train_id left join interval_price ip on t.train_id = ip.train_id and ip.dep_idx = 1 and ip.arr_idx = t.station_idx where t.train_id in (select distinct train_id from timetable where code_shown like %s) and t.station_idx >= 1 and t.station_shown order by t.station_idx;"
         conn = self.cp.getconn()
         cursor = conn.cursor()
         cursor.execute(stmt, (train,))
@@ -244,6 +244,43 @@ class Service:
         conn.commit()
         cursor.close()
         self.cp.putconn(conn)
+
+    def add_stop(self, train_id: int, code: str, dt: str, at: str, dd: int, ad: int):
+        stmt = "select code from station_info where code = %s;"
+        conn = self.cp.getconn()
+        cursor = conn.cursor()
+        cursor.execute(stmt, (code, ))
+        result = cursor.fetchall()
+        cursor.close()
+        self.cp.putconn(conn)
+        if len(result) != 1:
+            raise Exception('No such station')
+        stmt = "select add_stop(%s, %s, %s, %s, %s, %s);"
+        conn = self.cp.getconn()
+        cursor = conn.cursor()
+        cursor.execute(stmt, (train_id, code, dt, at, dd, ad))
+        conn.commit()
+        cursor.close()
+        self.cp.putconn(conn)
+
+    def edit_stop(self, train_id: int, idx: int, code: str, dt: str, at: str, dd: int, ad: int):
+        stmt = "select code from station_info where code = %s;"
+        conn = self.cp.getconn()
+        cursor = conn.cursor()
+        cursor.execute(stmt, (code, ))
+        result = cursor.fetchall()
+        cursor.close()
+        self.cp.putconn(conn)
+        if len(result) != 1:
+            raise Exception('No such station')
+        stmt = "select modify_stop(%s, %s, %s, %s, %s, %s, %s);"
+        conn = self.cp.getconn()
+        cursor = conn.cursor()
+        cursor.execute(stmt, (train_id, idx, code, dt, at, dd, ad))
+        conn.commit()
+        cursor.close()
+        self.cp.putconn(conn)
+
 
     def order_query(self):
         stmt = "select oi.order_id as id, t1.code_shown as num, pi.passenger_name as name, s1.station as dep, s2.station as arr, oi.order_price as price, to_char(oi.create_time, 'YYYY-MM-DD HH24:MI') as create_time, si.seat_type, si.seat_cabin, si.seat_code, to_char(oi.dep_date::timestamp + t1.day_dep * '1 day'::interval + t1.dep_time, 'YYYY-MM-DD HH24:MI') as dt, to_char(oi.dep_date::timestamp + t2.day_arr * '1 day'::interval + t2.arr_time, 'YYYY-MM-DD HH24:MI') as at, ti.seat_type, pi.idcard_number from order_info oi join passenger_info pi on oi.passenger_id = pi.passenger_id join timetable t1 on oi.train_id = t1.train_id and oi.dep_idx = t1.station_idx join timetable t2 on oi.train_id = t2.train_id and oi.arr_idx = t2.station_idx join station_info s1 on t1.station_code = s1.code join station_info s2 on t2.station_code = s2.code join seat_info si on oi.train_id = si.train_id and oi.seat_id = si.seat_no and oi.dep_date = si.dep_date join train_info ti on oi.train_id = ti.train_id where oi.passenger_id in (select oi.passenger_id from passenger_info where pi.related_user = %s) and oi.order_status = 1 order by order_id desc;"
