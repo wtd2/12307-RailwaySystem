@@ -1,6 +1,8 @@
 ## 12307-API 格式
 
-上线api: 除 *timetable* 均已上线
+[TOC]
+
+上线api: 除 [admin] 部分均已上线
 
 Url: http://sh.wtd2.top:81/api/
 
@@ -496,6 +498,83 @@ GET /api/deletepassenger?passenger_id=1
 GET /api/deletepassenger?passenger_id=2
 {
   "errcode": 1,
-  "errmsg": "无权限"
+  "errmsg": "No such privilege"
 }
 ```
+
+#### [admin] register
+
+```
+GET api/register
+username: str
+password: str
+admin: int (0 or 1)
+```
+
+提供用户名和密码，注册账户。
+
+```json
+GET /api/register?username=wtd2&password=wtd2&admin=0
+{
+	"errcode": 0,
+  "errmsg": ""
+}
+```
+
+#### [admin] addstop
+
+```
+GET api/addstop
+train_id: int
+station_code: str
+dep_time: int (HH*60+MI)
+dep_day: int
+arr_time: int (HH*60+MI)
+arr_day: int
+```
+
+```json
+GET /api/addstop?train_id=123&station_code=SHH&dep_time=360&dep_day=0&arr_time=363&arr_day=0
+{
+  "errcode": 0,
+  "errmsg": ""
+}
+```
+
+#### [admin] editstop
+
+```
+GET api/editstop
+train_id: int
+station_idx: int
+station_code: str
+dep_time: int (HH*60+MI)
+dep_day: int
+arr_time: int (HH*60+MI)
+arr_day: int
+```
+
+```json
+GET /api/editstop?train_id=123&station_idx=2&station_code=SHH&dep_time=360&dep_day=0&arr_time=363&arr_day=0
+{
+  "errcode": 0,
+  "errmsg": ""
+}
+```
+
+#### [admin] removestop
+
+```
+GET api/removestop
+train_id: int
+station_idx: int
+```
+
+```json
+GET /api/removestop?train_id=123&station_idx=2
+{
+  "errcode": 0,
+  "errmsg": ""
+}
+```
+
