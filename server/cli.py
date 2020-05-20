@@ -303,16 +303,16 @@ class Service:
         cursor.close()
         self.cp.putconn(conn)
 
-    # def order_query(self):
-    #     stmt = "select oi.order_id as id, t1.code_shown as num, pi.passenger_name as name, s1.station as dep, s2.station as arr, oi.order_price as price, to_char(oi.create_time, 'YYYY-MM-DD HH24:MI') as create_time, si.seat_type, si.seat_cabin, si.seat_code, to_char(oi.dep_date::timestamp + t1.day_dep * '1 day'::interval + t1.dep_time, 'YYYY-MM-DD HH24:MI') as dt, to_char(oi.dep_date::timestamp + t2.day_arr * '1 day'::interval + t2.arr_time, 'YYYY-MM-DD HH24:MI') as at, ti.seat_type, pi.idcard_number from order_info oi join passenger_info pi on oi.passenger_id = pi.passenger_id join timetable t1 on oi.train_id = t1.train_id and oi.dep_idx = t1.station_idx join timetable t2 on oi.train_id = t2.train_id and oi.arr_idx = t2.station_idx join station_info s1 on t1.station_code = s1.code join station_info s2 on t2.station_code = s2.code join seat_info si on oi.train_id = si.train_id and oi.seat_id = si.seat_no and oi.dep_date = si.dep_date join train_info ti on oi.train_id = ti.train_id where oi.passenger_id in (select oi.passenger_id from passenger_info where pi.related_user = %s) and oi.order_status = 1 order by order_id desc;"
-    #     conn = self.cp.getconn()
-    #     cursor = conn.cursor()
-    #     cursor.execute(stmt, (self.id,))
-    #     res = cursor.fetchall()
-    #     cursor.close()
-    #     self.cp.putconn(conn)
-    #     return res
-    #
+    def order_query(self):
+        stmt = "select oi.order_id as id, t1.code_shown as num, pi.passenger_name as name, s1.station as dep, s2.station as arr, oi.order_price as price, to_char(oi.create_time, 'YYYY-MM-DD HH24:MI') as create_time, si.seat_type, si.seat_cabin, si.seat_code, to_char(oi.dep_date::timestamp + t1.day_dep * '1 day'::interval + t1.dep_time, 'YYYY-MM-DD HH24:MI') as dt, to_char(oi.dep_date::timestamp + t2.day_arr * '1 day'::interval + t2.arr_time, 'YYYY-MM-DD HH24:MI') as at, ti.seat_type, pi.idcard_number from order_info oi join passenger_info pi on oi.passenger_id = pi.passenger_id join timetable t1 on oi.train_id = t1.train_id and oi.dep_idx = t1.station_idx join timetable t2 on oi.train_id = t2.train_id and oi.arr_idx = t2.station_idx join station_info s1 on t1.station_code = s1.code join station_info s2 on t2.station_code = s2.code join seat_info si on oi.train_id = si.train_id and oi.seat_id = si.seat_no and oi.dep_date = si.dep_date join train_info ti on oi.train_id = ti.train_id where oi.passenger_id in (select oi.passenger_id from passenger_info where pi.related_user = %s) and oi.order_status = 1 order by order_id desc;"
+        conn = self.cp.getconn()
+        cursor = conn.cursor()
+        cursor.execute(stmt, (self.id,))
+        res = cursor.fetchall()
+        cursor.close()
+        self.cp.putconn(conn)
+        return res
+
     # def purchase_main(self):
     #     cnt: int = 0
     #     dep_sta = self.sta_get('出发站:')
