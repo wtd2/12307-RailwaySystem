@@ -516,7 +516,7 @@ admin: int (0 or 1)
 ```json
 GET /api/register?username=wtd2&password=wtd2&admin=0
 {
-	"errcode": 0,
+  "errcode": 0,
   "errmsg": ""
 }
 ```
@@ -534,7 +534,7 @@ arr_day: int
 ```
 
 ```json
-GET /api/addstop?train_id=123&station_code=SHH&dep_time=360&dep_day=0&arr_time=363&arr_day=0
+GET /api/addstop?train_id=123&station_code=SHH&dep_time=363&dep_day=0&arr_time=360&arr_day=0
 {
   "errcode": 0,
   "errmsg": ""
@@ -555,7 +555,7 @@ arr_day: int
 ```
 
 ```json
-GET /api/editstop?train_id=123&station_idx=2&station_code=SHH&dep_time=360&dep_day=0&arr_time=363&arr_day=0
+GET /api/editstop?train_id=123&station_idx=2&station_code=SHH&dep_time=363&dep_day=0&arr_time=360&arr_day=0
 {
   "errcode": 0,
   "errmsg": ""
