@@ -2,9 +2,9 @@
 
 [TOC]
 
-上线api: 除 [admin] 部分均已上线
+上线api: 均已上线
 
-Url: http://sh.wtd2.top:81/api/
+Url: http://sh.wtd2.top:1234/api/
 
 #### login
 
